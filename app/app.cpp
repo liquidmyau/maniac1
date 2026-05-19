@@ -45,6 +45,9 @@ int main(int, char **) {
 
         message = "found beatmap";
 
+        // Small delay to let osu fully initialize the beatmap (important for retry)
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
         std::vector<osu::HitObject> hit_objects;
 
         for (int i = 0; i < 10; i++) {
@@ -133,6 +136,19 @@ int main(int, char **) {
         ImGui::InputInt("Tap time", &maniac::config.tap_time);
         ImGui::SameLine();
         help_marker("How long a key is held down for a single keypress, in milliseconds.");
+
+        horizontal_break();
+
+        ImGui::Checkbox("Closet Mode", &maniac::config.closet_mode);
+        ImGui::SameLine();
+        help_marker("Makes play look more human. Intentionally misses some notes and adds timing jitter to avoid detection.");
+
+        if (maniac::config.closet_mode) {
+            ImGui::InputInt("Miss Chance %", &maniac::config.miss_chance);
+            ImGui::SameLine();
+            help_marker("Percentage chance (1-100) to intentionally miss a note. Lower = more accurate but more detectable. Recommended: 3-8");
+            maniac::config.miss_chance = max(0, min(100, maniac::config.miss_chance));
+        }
 
         horizontal_break();
         ImGui::Dummy(ImVec2(0.0f, 5.0f));

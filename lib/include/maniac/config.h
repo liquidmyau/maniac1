@@ -7,7 +7,7 @@
 
 namespace maniac {
     struct config {
-        static constexpr int VERSION = 2;
+        static constexpr int VERSION = 3;
 
         static constexpr auto STATIC_HUMANIZATION = 0;
         static constexpr auto DYNAMIC_HUMANIZATION = 1;
@@ -20,7 +20,9 @@ namespace maniac {
         int randomization_stddev = 0;
         int humanization_type = DYNAMIC_HUMANIZATION;
 
+        bool closet_mode = false;
+        int miss_chance = 5;
+
         std::string keys = "asdfjkl;";
     };
 }
-

@@ -28,6 +28,9 @@ void config::read_from_file(struct maniac::config &c) {
         c.humanization_modifier = data["humanization_modifier"];
         c.keys = data["keys"];
 
+        if (data.contains("closet_mode")) c.closet_mode = data["closet_mode"];
+        if (data.contains("miss_chance")) c.miss_chance = data["miss_chance"];
+
         debug("loaded config from file");
     } catch (json::parse_error &err) {
         debug("failed parsing config: '%s'", err.what());
@@ -44,7 +47,9 @@ void config::write_to_file(struct maniac::config &c) {
             {"randomization_stddev", c.randomization_stddev},
             {"humanization_type", c.humanization_type},
             {"humanization_modifier", c.humanization_modifier},
-            {"keys", c.keys}
+            {"keys", c.keys},
+            {"closet_mode", c.closet_mode},
+            {"miss_chance", c.miss_chance}
     };
 
     std::ofstream file(file_name);

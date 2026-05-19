@@ -22,9 +22,14 @@ namespace maniac {
                 reset_keys();
 
                 size_t cur_i = 0;
-                auto cur_time = 0;
+                auto prev_time = 0;
                 auto raw_actions = actions.data();
                 auto total_actions = actions.size();
+
+                std::random_device rd;
+                std::mt19937 gen(rd());
+                std::uniform_int_distribution<> miss_dist(1, 100);
+                std::uniform_int_distribution<> tap_jitter(-3, 3);
 
                 while (cur_i < total_actions) {
                         if (!osu->is_playing()) {
@@ -32,9 +37,45 @@ namespace maniac {
                                 return;
                         }
 
-                        cur_time = osu->get_game_time();
+                        auto cur_time = osu->get_game_time();
+
+                        // Detect retry: game time dropped significantly, beatmap restarted
+                        if (cur_time < prev_time - 1000 && prev_time > 0) {
+                                debug("detected retry (time went from %d to %d), restarting", prev_time, cur_time);
+                                reset_keys();
+                                return;
+                        }
+
+                        prev_time = cur_time;
+
                         while (cur_i < total_actions && (raw_actions + cur_i)->time <= cur_time) {
-                                (raw_actions + cur_i)->execute();
+                                const auto &action = raw_actions[cur_i];
+
+                                if (config.closet_mode && action.down) {
+                                        // Check if this key_down should be missed (skip both down and up)
+                                        if (miss_dist(gen) <= config.miss_chance) {
+                                                debug("closet mode: skipping note at time %d", action.time);
+                                                // Skip the key down action
+                                                cur_i++;
+                                                // Also skip the corresponding key up action
+                                                if (cur_i < total_actions && !raw_actions[cur_i].down
+                                                        && raw_actions[cur_i].key == action.key) {
+                                                        cur_i++;
+                                                }
+                                                continue;
+                                        }
+
+                                        // Add extra timing jitter for closet mode
+                                        if (config.miss_chance > 0) {
+                                                auto jitter = tap_jitter(gen);
+                                                if (jitter != 0) {
+                                                        std::this_thread::sleep_for(
+                                                                std::chrono::milliseconds(abs(jitter)));
+                                                }
+                                        }
+                                }
+
+                                action.execute();
 
                                 cur_i++;
                         }
