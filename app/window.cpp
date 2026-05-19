@@ -149,9 +149,9 @@ void window::start(const std::function<void()> &body) {
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 
     // Setup Dear ImGui style
-    //ImGui::StyleColorsDark();
+    ImGui::StyleColorsDark();
     //ImGui::StyleColorsClassic();
-    ImGui::StyleColorsLight();
+    //ImGui::StyleColorsLight();
 
     // Setup Platform/Renderer backends
     ImGui_ImplWin32_Init(hwnd);
@@ -193,14 +193,14 @@ void window::start(const std::function<void()> &body) {
 
         body();
 
-	maniac::config.tap_time = max(0, maniac::config.tap_time);
-	maniac::config.humanization_modifier = max(0, maniac::config.humanization_modifier);
+        maniac::config.tap_time = max(0, maniac::config.tap_time);
+        maniac::config.humanization_modifier = max(0, maniac::config.humanization_modifier);
 
         ImGui::EndFrame();
         g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
         g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
         g_pd3dDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
-        ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+        ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
         D3DCOLOR clear_col_dx = D3DCOLOR_RGBA((int) (clear_color.x * clear_color.w * 255.0f),
                 (int) (clear_color.y * clear_color.w * 255.0f),
                 (int) (clear_color.z * clear_color.w * 255.0f), (int) (clear_color.w * 255.0f));
