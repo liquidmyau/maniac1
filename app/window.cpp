@@ -11,8 +11,7 @@
 
 #include <algorithm>
 
-#include <maniac/common.h>
-#include <maniac/config.h>
+#include <maniac/maniac.h>
 
 // TODO: Most of this is taken straight out of some example in the imgui repository, needs to be refactored
 
