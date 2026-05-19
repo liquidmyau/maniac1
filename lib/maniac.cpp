@@ -8,38 +8,42 @@ namespace maniac {
         }
     }
 
-	void block_until_playing() {
-		while (true) {
-			if (osu->is_playing()) {
+        void block_until_playing() {
+                while (true) {
+                        if (osu->is_playing()) {
                 break;
             }
 
             std::this_thread::sleep_for(std::chrono::milliseconds(250));
-		}
-	}
+                }
+        }
 
-	void play(const std::vector<Action> &actions) {
-		reset_keys();
+        void play(const std::vector<Action> &actions) {
+                reset_keys();
 
-		size_t cur_i = 0;
-		auto cur_time = 0;
-		auto raw_actions = actions.data();
-		auto total_actions = actions.size();
+                size_t cur_i = 0;
+                auto cur_time = 0;
+                auto raw_actions = actions.data();
+                auto total_actions = actions.size();
 
-		while (cur_i < total_actions) {
-			if (!osu->is_playing())
-				return;
+                while (cur_i < total_actions) {
+                        if (!osu->is_playing()) {
+                                reset_keys();
+                                return;
+                        }
 
-			cur_time = osu->get_game_time();
-			while (cur_i < total_actions && (raw_actions + cur_i)->time <= cur_time) {
-				(raw_actions + cur_i)->execute();
+                        cur_time = osu->get_game_time();
+                        while (cur_i < total_actions && (raw_actions + cur_i)->time <= cur_time) {
+                                (raw_actions + cur_i)->execute();
 
-				cur_i++;
-			}
+                                cur_i++;
+                        }
 
-			std::this_thread::sleep_for(std::chrono::nanoseconds(100));
-		}
-	}
+                        std::this_thread::sleep_for(std::chrono::nanoseconds(100));
+                }
+
+                reset_keys();
+        }
 
     std::vector<Action> to_actions(std::vector<osu::HitObject> &hit_objects, int32_t min_time) {
         if (hit_objects.empty()) {
